@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0: 꺼짐</string>
     <string name="patch_sigbypasslv1">lv1: PM 우회</string>
     <string name="patch_sigbypasslv2">lv2: PM + openat(libc) 우회</string>
+    <string name="patch_sigbypasslv3">lv3: 강화 우회 (모든 방법)</string>
     <string name="patch_override_version_code">버전 코드 덮어씌우기</string>
     <string name="patch_override_version_code_desc">패치된 앱의 버전 코드를 1\n으로 덮어씌웁니다. 이렇게 하면 향후 다운그레이드 설치를 할 수 있으며 일반적으로 애플리케이션에서 실제로 인식하는 버전 코드에는 영향을 미치지 않습니다.</string>
     <string name="patch_start">패치 시작</string>

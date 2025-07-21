@@ -15,6 +15,8 @@ import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
+import org.lsposed.lspatch.share.BuildConfig
+
 object ShizukuApi {
 
     private fun IBinder.wrap() = ShizukuBinderWrapper(this)
@@ -64,7 +66,7 @@ object ShizukuApi {
         } else {
             iPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA, userId)
         }
-        return (app != null) && (app.metaData?.containsKey("lspatch") != true)
+        return (app != null) && (app.metaData?.containsKey(BuildConfig.OBFUSCATED_METADATA_KEY) != true)
     }
 
     fun uninstallPackage(packageName: String, intentSender: IntentSender) {

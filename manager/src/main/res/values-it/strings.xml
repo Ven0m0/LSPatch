@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0: Off</string>
     <string name="patch_sigbypasslv1">lv1: Bypass PM</string>
     <string name="patch_sigbypasslv2">lv2: Bypass PM + openat (libc)</string>
+    <string name="patch_sigbypasslv3">lv3: Bypass avanzato (tutti i metodi)</string>
     <string name="patch_override_version_code">Sostituisci il codice versione</string>
     <string name="patch_override_version_code_desc">Sostituisci il codice versione dell\'applicazione patchata con 1\nQuesto permette il downgrade dell\'installazione in futuro, e generalmente questo non influenzerà il codice versione effettivamente percepito dall\'applicazione</string>
     <string name="patch_start">Avvia Patch</string>

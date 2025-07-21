@@ -1,12 +1,22 @@
 import java.util.Locale
+import java.util.Random
 
 plugins {
     alias(libs.plugins.agp.app)
 }
 
+fun randomString(length: Int): String {
+    val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    return (1..length)
+        .map { Random().nextInt(charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
+}
+
 android {
     defaultConfig {
         multiDexEnabled = false
+        buildConfigField("String", "OBFUSCATED_TAG", "\"LSPatch-${randomString(8)}\"")
     }
 
     buildFeatures {

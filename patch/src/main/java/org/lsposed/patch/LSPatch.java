@@ -22,6 +22,7 @@ import com.wind.meditor.property.ModificationProperty;
 import com.wind.meditor.utils.NodeValue;
 
 import org.apache.commons.io.FilenameUtils;
+import org.lsposed.lspatch.share.BuildConfig;
 import org.lsposed.lspatch.share.Constants;
 import org.lsposed.lspatch.share.LSPConfig;
 import org.lsposed.lspatch.share.PatchConfig;
@@ -287,7 +288,7 @@ public class LSPatch {
                 try (var is = getClass().getClassLoader().getResourceAsStream(LOADER_DEX_ASSET_PATH)) {
                     dstZFile.add(LOADER_DEX_ASSET_PATH, is);
                 } catch (Throwable e) {
-                    throw new PatchError("Error when adding assets", e);
+                    throw new PatchError("Error when adding assets");
                 }
 
                 logger.i("Adding native lib...");
@@ -353,7 +354,7 @@ public class LSPatch {
             property.addUsesSdkAttribute(new AttributeItem(NodeValue.UsesSDK.MIN_SDK_VERSION, 28));
         property.addApplicationAttribute(new AttributeItem(NodeValue.Application.DEBUGGABLE, debuggableFlag));
         property.addApplicationAttribute(new AttributeItem("appComponentFactory", PROXY_APP_COMPONENT_FACTORY));
-        property.addMetaData(new ModificationProperty.MetaData("lspatch", metadata));
+        property.addMetaData(new ModificationProperty.MetaData(BuildConfig.OBFUSCATED_METADATA_KEY, metadata));
         // TODO: replace query_all with queries -> manager
         if (useManager)
             property.addUsesPermission("android.permission.QUERY_ALL_PACKAGES");

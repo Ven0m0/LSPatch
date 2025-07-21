@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">ур. 0: Выкл.</string>
     <string name="patch_sigbypasslv1">ур. 1: Обход PM</string>
     <string name="patch_sigbypasslv2">ур. 2: Обход PM + openat (libc)</string>
+    <string name="patch_sigbypasslv3">ур. 3: Расширенный обход (все методы)</string>
     <string name="patch_override_version_code">Переопределение кода версии</string>
     <string name="patch_override_version_code_desc">Переопределить код версии пропатченного приложения на 1.\nЭто позволит понижать версию установки и совершенно не повлияет на код версии, фактически воспринимаемый приложением.</string>
     <string name="patch_start">Запустить патч</string>

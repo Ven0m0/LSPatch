@@ -46,6 +46,10 @@ android {
         kotlinCompilerExtensionVersion = "1.5.13"
     }
 
+    lint {
+        disable.add("RestrictedApi")
+    }
+
     namespace = "org.lsposed.lspatch"
 
     applicationVariants.all {
@@ -61,6 +65,18 @@ afterEvaluate {
     android.applicationVariants.forEach { variant ->
         val variantLowered = variant.name.lowercase()
         val variantCapped = variant.name.replaceFirstChar { it.uppercase() }
+
+        tasks.named("generate${variantCapped}LintReportModel") {
+            dependsOn(":patch-loader:copyDex$variantCapped")
+            dependsOn(":meta-loader:copyDex$variantCapped")
+            dependsOn(":patch-loader:copySo$variantCapped")
+        }
+
+        tasks.named("lintAnalyze$variantCapped") {
+            dependsOn(":patch-loader:copyDex$variantCapped")
+            dependsOn(":meta-loader:copyDex$variantCapped")
+            dependsOn(":patch-loader:copySo$variantCapped")
+        }
 
         task<Copy>("copy${variantCapped}Assets") {
             dependsOn(":meta-loader:copy$variantCapped")

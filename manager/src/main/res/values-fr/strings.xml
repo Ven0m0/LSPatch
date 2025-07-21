@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0 : Désactivé</string>
     <string name="patch_sigbypasslv1">lv1 : Contourner PM</string>
     <string name="patch_sigbypasslv2">lv2 : Contourner PM + openat (libc)</string>
+    <string name="patch_sigbypasslv3">lv3 : Contournement amélioré (toutes méthodes)</string>
     <string name="patch_override_version_code">Remplacer le code de version</string>
     <string name="patch_override_version_code_desc">Remplacer le code de version de l\'application corrigée par 1\nCela permet de rétrograder l\'installation à l\'avenir, et généralement cela n\'affectera pas le code de version réellement perçu par l\'application.</string>
     <string name="patch_start">Démarrer le correctif</string>

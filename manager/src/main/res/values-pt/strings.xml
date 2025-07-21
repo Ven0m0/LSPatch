@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0: Desligado</string>
     <string name="patch_sigbypasslv1">lv1: Ignorar PM</string>
     <string name="patch_sigbypasslv2">lv2: Ignorar PM + openat (libc)</string>
+    <string name="patch_sigbypasslv3">lv3: Bypass aprimorado (todos os métodos)</string>
     <string name="patch_override_version_code">Substituir o código da versão</string>
     <string name="patch_override_version_code_desc">Substitua o código de versão do aplicativo corrigido para 1\nIsso permite a instalação de downgrade no futuro, e geralmente isso não afetará o código de versão realmente percebido pela aplicação</string>
     <string name="patch_start">Iniciar patch</string>

@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0: Desactivado</string>
     <string name="patch_sigbypasslv1">lv1: Pasar PM</string>
     <string name="patch_sigbypasslv2">lv2: Omitir PM + abrir en (libc)</string>
+    <string name="patch_sigbypasslv3">lv3: Bypass mejorado (todos los métodos)</string>
     <string name="patch_override_version_code">Anular código de versión</string>
     <string name="patch_override_version_code_desc">Anular el código de versión de la app parcheada a 1\nEsto permite la instalación de downgrade en el futuro, y generalmente esto no afectará al código de versión realmente percibido por la aplicación</string>
     <string name="patch_start">Parche de inicio</string>

@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.lsposed.lspatch.Patcher
 import org.lsposed.lspatch.lspApp
+import org.lsposed.lspatch.share.BuildConfig
 import org.lsposed.lspatch.share.Constants
 import org.lsposed.lspatch.share.PatchConfig
 import org.lsposed.lspatch.ui.viewstate.ProcessingState
@@ -40,7 +41,7 @@ class AppManageViewModel : ViewModel() {
 
     val appList: List<Pair<AppInfo, PatchConfig>> by derivedStateOf {
         LSPPackageManager.appList.mapNotNull { appInfo ->
-            appInfo.app.metaData?.getString("lspatch")?.let {
+            appInfo.app.metaData?.getString(BuildConfig.OBFUSCATED_METADATA_KEY)?.let {
                 val json = Base64.decode(it, Base64.DEFAULT).toString(Charsets.UTF_8)
                 Log.d(TAG, "Read patched config: $json")
                 appInfo to Gson().fromJson(json, PatchConfig::class.java)

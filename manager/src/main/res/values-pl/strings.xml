@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">poziom 0: wyłączony</string>
     <string name="patch_sigbypasslv1">lv1: Pomiń PM</string>
     <string name="patch_sigbypasslv2">lv2: Pomiń PM + openat (libc)</string>
+    <string name="patch_sigbypasslv3">lv3: Rozszerzony bypass (wszystkie metody)</string>
     <string name="patch_override_version_code">Zastąp kod wersji</string>
     <string name="patch_override_version_code_desc">Zastąp kod wersji załatanej aplikacji na 1\nUmożliwi to instalację w przyszłości, a generalnie nie będzie miało wpływu na kod wersji faktycznie odbierany przez aplikację</string>
     <string name="patch_start">Rozpocznij łatkę</string>

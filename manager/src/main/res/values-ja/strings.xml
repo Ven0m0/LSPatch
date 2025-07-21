@@ -60,6 +60,7 @@
     <string name="patch_sigbypasslv0">lv0: オフ</string>
     <string name="patch_sigbypasslv1">lv1: PMをバイパス</string>
     <string name="patch_sigbypasslv2">lv2: PMをバイパス + openat (libc)</string>
+    <string name="patch_sigbypasslv3">lv3: 強化バイパス（全手法）</string>
     <string name="patch_override_version_code">バージョンコードを上書き</string>
     <string name="patch_override_version_code_desc">パッチを適用するアプリのバージョンコードを1に上書きします。\nこれを行う事で将来的にダウングレードのインストールが可能になります。アプリが通常時に認識するバージョンコードには影響は与えません。</string>
     <string name="patch_start">パッチを開始</string>
