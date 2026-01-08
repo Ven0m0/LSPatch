@@ -30,6 +30,7 @@ import java.io.File
 import java.io.IOException
 import java.text.Collator
 import java.util.*
+import java.util.zip.ZipInputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -92,18 +93,51 @@ object LSPPackageManager {
                 ShizukuApi.createPackageInstallerSession(params).use { session ->
                     val uri = Configs.storageDirectory?.toUri() ?: throw IOException("Uri is null")
                     val root = DocumentFile.fromTreeUri(lspApp, uri) ?: throw IOException("DocumentFile is null")
-                    root.listFiles().forEach { file ->
-                        if (file.name?.endsWith(Constants.PATCH_FILE_SUFFIX) != true) return@forEach
-                        Log.d(TAG, "Add ${file.name}")
-                        val input = lspApp.contentResolver.openInputStream(file.uri)
-                            ?: throw IOException("Cannot open input stream")
-                        input.use {
-                            session.openWrite(file.name!!, 0, input.available().toLong()).use { output ->
-                                input.copyTo(output)
-                                session.fsync(output)
+
+                    // Check for .apks bundle first
+                    val bundleFile = root.listFiles().find {
+                        it.name?.endsWith(Constants.PATCH_BUNDLE_SUFFIX) == true
+                    }
+
+                    if (bundleFile != null) {
+                        // Extract APKs from bundle and add to session
+                        Log.d(TAG, "Installing from bundle: ${bundleFile.name}")
+                        val bundleInput = lspApp.contentResolver.openInputStream(bundleFile.uri)
+                            ?: throw IOException("Cannot open bundle input stream")
+                        bundleInput.use {
+                            ZipInputStream(it).use { zis ->
+                                var entry = zis.nextEntry
+                                while (entry != null) {
+                                    if (entry.name.endsWith(".apk")) {
+                                        Log.d(TAG, "Extracting from bundle: ${entry.name}")
+                                        // Use entry.size if available, otherwise -1 for unknown size
+                                        val size = if (entry.size >= 0) entry.size else -1L
+                                        session.openWrite(entry.name, 0, size).use { output ->
+                                            zis.copyTo(output)
+                                            session.fsync(output)
+                                        }
+                                    }
+                                    zis.closeEntry()
+                                    entry = zis.nextEntry
+                                }
+                            }
+                        }
+                    } else {
+                        // Fallback: install individual APK files
+                        root.listFiles().forEach { file ->
+                            if (file.name?.endsWith(Constants.PATCH_FILE_SUFFIX) != true) return@forEach
+                            Log.d(TAG, "Add ${file.name}")
+                            val input = lspApp.contentResolver.openInputStream(file.uri)
+                                ?: throw IOException("Cannot open input stream")
+                            input.use {
+                                session.openWrite(file.name!!, 0, input.available().toLong()).use { output ->
+                                    input.copyTo(output)
+                                    session.fsync(output)
+                                }
                             }
                         }
                     }
+
                     var result: Intent? = null
                     suspendCoroutine { cont ->
                         val adapter = IntentSenderHelper.IIntentSenderAdaptor { intent ->

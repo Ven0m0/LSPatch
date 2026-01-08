@@ -49,23 +49,48 @@ object Patcher {
                 ?: throw IOException("Uri is null")
             val root = DocumentFile.fromTreeUri(lspApp, uri)
                 ?: throw IOException("DocumentFile is null")
+
+            // Delete old patched files (both bundles and individual APKs)
             root.listFiles().forEach {
-                if (it.name?.endsWith(Constants.PATCH_FILE_SUFFIX) == true) it.delete()
+                if (it.name?.endsWith(Constants.PATCH_FILE_SUFFIX) == true ||
+                    it.name?.endsWith(Constants.PATCH_BUNDLE_SUFFIX) == true) {
+                    it.delete()
+                }
             }
-            lspApp.tmpApkDir.walk()
-                .filter { it.name.endsWith(Constants.PATCH_FILE_SUFFIX) }
-                .forEach { apk ->
-                    val file = root.createFile("application/vnd.android.package-archive", apk.name)
-                        ?: throw IOException("Failed to create output file")
-                    val output = lspApp.contentResolver.openOutputStream(file.uri)
-                        ?: throw IOException("Failed to open output stream")
-                    output.use {
-                        apk.inputStream().use { input ->
-                            input.copyTo(output)
-                        }
+
+            // Check for bundle file first (.apks), then individual APKs
+            val bundleFile = lspApp.tmpApkDir.listFiles()
+                ?.find { it.name.endsWith(Constants.PATCH_BUNDLE_SUFFIX) }
+
+            if (bundleFile != null) {
+                // Copy single bundle file (use octet-stream to avoid adding .zip extension)
+                val file = root.createFile("application/octet-stream", bundleFile.name)
+                    ?: throw IOException("Failed to create output bundle file")
+                val output = lspApp.contentResolver.openOutputStream(file.uri)
+                    ?: throw IOException("Failed to open output stream")
+                output.use {
+                    bundleFile.inputStream().use { input ->
+                        input.copyTo(output)
                     }
                 }
-            logger.i("Patched files are saved to ${root.uri.lastPathSegment}")
+                logger.i("Bundle saved to ${root.uri.lastPathSegment}/${bundleFile.name}")
+            } else {
+                // Fallback: copy individual APK files (single APK case)
+                lspApp.tmpApkDir.walk()
+                    .filter { it.name.endsWith(Constants.PATCH_FILE_SUFFIX) }
+                    .forEach { apk ->
+                        val file = root.createFile("application/vnd.android.package-archive", apk.name)
+                            ?: throw IOException("Failed to create output file")
+                        val output = lspApp.contentResolver.openOutputStream(file.uri)
+                            ?: throw IOException("Failed to open output stream")
+                        output.use {
+                            apk.inputStream().use { input ->
+                                input.copyTo(output)
+                            }
+                        }
+                    }
+                logger.i("Patched files are saved to ${root.uri.lastPathSegment}")
+            }
         }
     }
 }
