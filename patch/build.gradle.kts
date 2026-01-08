@@ -16,6 +16,23 @@ java {
     }
 }
 
+val copyLspatchAssets by tasks.registering(Copy::class) {
+    val variant = "release"
+    dependsOn(":meta-loader:copy${variant.replaceFirstChar { it.uppercase() }}")
+    dependsOn(":patch-loader:copy${variant.replaceFirstChar { it.uppercase() }}")
+
+    from("${rootProject.projectDir}/out/assets/$variant/lspatch")
+    into("$projectDir/src/main/resources/assets/lspatch")
+}
+
+tasks.named("compileJava") {
+    dependsOn(copyLspatchAssets)
+}
+
+tasks.named("processResources") {
+    dependsOn(copyLspatchAssets)
+}
+
 dependencies {
     implementation(projects.axml)
     implementation(projects.apkzlib)
