@@ -312,6 +312,19 @@ public class LSPatch {
             final boolean skipSplit = apkPaths.size() > 1 && srcApkFile.getName().startsWith("split_") && appComponentFactory == null;
             if (skipSplit) {
                 logger.i("Packing split apk...");
+
+                // Fix: Also modify split APK manifest when overrideVersionCode is set
+                if (overrideVersionCode) {
+                    logger.d("Updating split apk versionCode to 1");
+                    ModificationProperty property = new ModificationProperty();
+                    property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_CODE, 1));
+                    var os = new ByteArrayOutputStream();
+                    (new ManifestEditor(manifestEntry.open(), os, property)).processManifest();
+                    os.flush();
+                    os.close();
+                    dstZFile.add(ANDROID_MANIFEST_XML, new ByteArrayInputStream(os.toByteArray()));
+                }
+
                 for (StoredEntry entry : srcZFile.entries()) {
                     String name = entry.getCentralDirectoryHeader().getName();
                     if (dstZFile.get(name) != null) continue;
