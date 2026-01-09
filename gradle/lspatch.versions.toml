@@ -1,6 +1,6 @@
 [versions]
 room = "2.8.4"
-accompanist = "0.34.0"
+accompanist = "0.36.0"
 compose-destinations = "1.11.7"
 shizuku = "13.1.5"
 hiddenapi = "4.4.0"
