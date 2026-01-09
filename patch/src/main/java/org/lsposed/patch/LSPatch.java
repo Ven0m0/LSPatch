@@ -139,7 +139,8 @@ public class LSPatch {
     }
 
     public static void main(String... args) throws IOException {
-        LSPatch lspatch = new LSPatch(new JavaLogger(), args);
+        JavaLogger logger = new JavaLogger();
+        LSPatch lspatch = new LSPatch(logger, args);
         if (lspatch.help) {
             lspatch.jCommander.usage();
             return;
@@ -147,7 +148,10 @@ public class LSPatch {
         try {
             lspatch.doCommandLine();
         } catch (PatchError e) {
-            e.printStackTrace(System.err);
+            logger.e("Patch error: " + e.getMessage());
+            if (logger.verbose) {
+                e.printStackTrace(System.err);
+            }
         }
     }
 
@@ -318,11 +322,12 @@ public class LSPatch {
                     logger.d("Updating split apk versionCode to 1");
                     ModificationProperty property = new ModificationProperty();
                     property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_CODE, 1));
-                    var os = new ByteArrayOutputStream();
-                    (new ManifestEditor(manifestEntry.open(), os, property)).processManifest();
-                    os.flush();
-                    os.close();
-                    dstZFile.add(ANDROID_MANIFEST_XML, new ByteArrayInputStream(os.toByteArray()));
+                    try (var os = new ByteArrayOutputStream(); 
+                         var is = manifestEntry.open()) {
+                        (new ManifestEditor(is, os, property)).processManifest();
+                        os.flush();
+                        dstZFile.add(ANDROID_MANIFEST_XML, new ByteArrayInputStream(os.toByteArray()));
+                    }
                 }
 
                 for (StoredEntry entry : srcZFile.entries()) {
@@ -445,11 +450,11 @@ public class LSPatch {
         if (useManager)
             property.addUsesPermission("android.permission.QUERY_ALL_PACKAGES");
 
-        var os = new ByteArrayOutputStream();
-        (new ManifestEditor(is, os, property)).processManifest();
-        is.close();
-        os.flush();
-        os.close();
-        return os.toByteArray();
+        try (var os = new ByteArrayOutputStream()) {
+            (new ManifestEditor(is, os, property)).processManifest();
+            is.close();
+            os.flush();
+            return os.toByteArray();
+        }
     }
 }

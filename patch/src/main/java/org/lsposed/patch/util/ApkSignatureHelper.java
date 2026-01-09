@@ -35,13 +35,13 @@ public class ApkSignatureHelper {
     }
 
     private static Certificate[] loadCertificates(JarFile jarFile, JarEntry je, byte[] readBuffer) {
-        try {
-            InputStream is = jarFile.getInputStream(je);
+        try (InputStream is = jarFile.getInputStream(je)) {
             while (is.read(readBuffer, 0, readBuffer.length) != -1) {
+                // Read all bytes to trigger certificate validation
             }
-            is.close();
             return (Certificate[]) (je != null ? je.getCertificates() : null);
         } catch (Exception e) {
+            // Certificate validation failed
         }
         return null;
     }
@@ -57,8 +57,7 @@ public class ApkSignatureHelper {
     public static String getApkSignV1(String apkFilePath) {
         byte[] readBuffer = new byte[8192];
         Certificate[] certs = null;
-        try {
-            JarFile jarFile = new JarFile(apkFilePath);
+        try (JarFile jarFile = new JarFile(apkFilePath)) {
             Enumeration<?> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry je = (JarEntry) entries.nextElement();
@@ -81,13 +80,11 @@ public class ApkSignatureHelper {
                             }
                         }
                         if (!found || certs.length != localCerts.length) {
-                            jarFile.close();
                             return null;
                         }
                     }
                 }
             }
-            jarFile.close();
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
         } catch (Throwable ignored) {
         }

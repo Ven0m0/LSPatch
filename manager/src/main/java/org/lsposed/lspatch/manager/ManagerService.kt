@@ -33,7 +33,7 @@ object ManagerService : ILSPApplicationService.Stub() {
     }
 
     override fun getPrefsPath(packageName: String): String {
-        TODO("Not yet implemented")
+        return lspApp.getDir("prefs", 0).resolve(packageName).absolutePath
     }
 
     override fun requestInjectedManagerBinder(binder: List<IBinder>?): ParcelFileDescriptor? {
