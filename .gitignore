@@ -18,3 +18,8 @@ libxposed
 .cxx
 /out
 /.idea
+.java-version
+
+/patch/src/main/resources/assets/lspatch/loader.dex
+/patch/src/main/resources/assets/lspatch/metaloader.dex
+/patch/src/main/resources/assets/lspatch/so/

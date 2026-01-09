@@ -262,7 +262,7 @@ public class LSPatch {
                 var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 if (keystoreArgs.get(0) == null) {
                     logger.i("Register apk signer with default keystore...");
-                    try (var is = getClass().getClassLoader().getResourceAsStream("assets/keystore")) {
+                    try (var is = getClass().getClassLoader().getResourceAsStream("assets/keystore.jks")) {
                         keyStore.load(is, keystoreArgs.get(1).toCharArray());
                     }
                 } else {
