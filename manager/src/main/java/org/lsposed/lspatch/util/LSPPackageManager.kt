@@ -191,7 +191,7 @@ object LSPPackageManager {
             runCatching {
                 var primary: ApplicationInfo? = null
                 val splits = mutableListOf<String>()
-                val expectedPackageName = mutableSetOf<String>()
+                var expectedPackageName: String? = null
                 val appInfos = apks.mapNotNull { uri ->
                     val src = DocumentFile.fromSingleUri(lspApp, uri)
                         ?: throw IOException("DocumentFile is null")
