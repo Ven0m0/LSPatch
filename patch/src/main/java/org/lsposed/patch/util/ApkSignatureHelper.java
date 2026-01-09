@@ -91,7 +91,7 @@ public class ApkSignatureHelper {
             }
             jarFile.close();
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
-        } catch (Throwable ignored) {
+        } catch (Exception ignored) {
             // Failed to extract signature, return null
         }
         return null;
