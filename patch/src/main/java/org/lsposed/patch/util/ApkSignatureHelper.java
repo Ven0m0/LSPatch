@@ -18,6 +18,7 @@ import java.util.jar.JarFile;
 public class ApkSignatureHelper {
     private static final byte[] APK_V2_MAGIC = {'A', 'P', 'K', ' ', 'S', 'i', 'g', ' ',
             'B', 'l', 'o', 'c', 'k', ' ', '4', '2'};
+    private static final int APK_V2_SIGNER_SEQUENCE_ID = 0x7109871a;
 
     private static char[] toChars(byte[] mSignature) {
         byte[] sig = mSignature;
@@ -43,7 +44,6 @@ public class ApkSignatureHelper {
         } catch (Exception e) {
             // Certificate validation failed
         }
-        return null;
     }
 
     public static String getApkSignInfo(String apkFilePath) {
@@ -86,9 +86,10 @@ public class ApkSignatureHelper {
                 }
             }
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
-        } catch (Throwable ignored) {
+        } catch (IOException | java.security.cert.CertificateException e) {
+            // V1 signature verification failed
+            return null;
         }
-        return null;
     }
 
     private static String getApkSignV2(String apkFilePath) throws IOException {
@@ -127,7 +128,7 @@ public class ApkSignatureHelper {
 
             while (block.remaining() > 24) {
                 size = (int) block.getLong();
-                if (block.getInt() == 0x7109871a) {
+                if (block.getInt() == APK_V2_SIGNER_SEQUENCE_ID) {
                     // signer-sequence length, signer length, signed data length
                     block.position(block.position() + 12);
                     size = block.getInt(); // digests-sequence length

@@ -53,7 +53,10 @@ public class SigBypass {
                             Log.w(TAG, "fail to get originalSignature", e);
                         }
                     }
-                } catch (PackageManager.NameNotFoundException | JsonSyntaxException ignored) {
+                } catch (PackageManager.NameNotFoundException e) {
+                    XLog.d(TAG, "Package not found: " + packageName);
+                } catch (JsonSyntaxException e) {
+                    XLog.w(TAG, "Invalid JSON syntax in package metadata", e);
                 }
                 signatures.put(packageName, replacement);
             }
