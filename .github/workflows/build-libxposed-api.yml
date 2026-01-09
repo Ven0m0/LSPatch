@@ -1,0 +1,55 @@
+name: Build libxposed/api
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build libxposed/api
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: '%compiler% -dumpmachine; %compiler% -dumpversion'
+      CCACHE_NOHASHDIR: 'true'
+      CCACHE_HARDLINK: 'true'
+      CCACHE_BASEDIR: '${{ github.workspace }}'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+
+    - name: Checkout libxposed/api
+      uses: actions/checkout@main
+      with:
+        repository: libxposed/api
+        path: libxposed/api
+        ref: 54582730315ba4a3d7cfaf9baf9d23c419e07006
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build libxposed/api
+      working-directory: libxposed/api
+      run: |
+        echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
+        ./gradlew :api:assemble
+
+    - name: Set short commit id
+      run: echo "commit=$(echo ${{ github.sha }} | cut -c-7)" > $GITHUB_ENV
+
+    - name: Upload libxposed/api artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: libxposed-api-${{ env.commit }}
+        path: libxposed/api/api/build/outputs/*
