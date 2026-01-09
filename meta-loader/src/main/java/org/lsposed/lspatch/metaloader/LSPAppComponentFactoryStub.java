@@ -81,9 +81,9 @@ public class LSPAppComponentFactoryStub extends AppComponentFactory {
                 var ipm = IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
                 ApplicationInfo manager;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    manager = (ApplicationInfo) HiddenApiBypass.invoke(IPackageManager.class, ipm, "getApplicationInfo", Constants.MANAGER_PACKAGE_NAME, 0L, Process.myUid() / 100000);
+                    manager = (ApplicationInfo) HiddenApiBypass.invoke(IPackageManager.class, ipm, "getApplicationInfo", Constants.MANAGER_PACKAGE_NAME, 0L, Process.myUid() / Constants.PER_USER_RANGE);
                 } else {
-                    manager = ipm.getApplicationInfo(Constants.MANAGER_PACKAGE_NAME, 0, Process.myUid() / 100000);
+                    manager = ipm.getApplicationInfo(Constants.MANAGER_PACKAGE_NAME, 0, Process.myUid() / Constants.PER_USER_RANGE);
                 }
                 try (var zip = new ZipFile(new File(manager.sourceDir));
                      var is = zip.getInputStream(zip.getEntry(Constants.LOADER_DEX_ASSET_PATH));

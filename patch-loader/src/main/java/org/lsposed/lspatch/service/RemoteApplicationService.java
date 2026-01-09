@@ -42,7 +42,9 @@ public class RemoteApplicationService implements ILSPApplicationService {
             var intent = new Intent()
                     .setComponent(new ComponentName(Constants.MANAGER_PACKAGE_NAME, MODULE_SERVICE))
                     .putExtra("packageName", context.getPackageName());
-            // TODO: Authentication
+            // TODO: Authentication - Verify calling UID matches expected manager package
+            // Security concern: Any app can currently bind to this service and request module list
+            // Recommended: Add signature verification or UID/package name validation
             var latch = new CountDownLatch(1);
             var conn = new ServiceConnection() {
                 @Override
