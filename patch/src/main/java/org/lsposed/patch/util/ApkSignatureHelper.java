@@ -18,6 +18,7 @@ import java.util.jar.JarFile;
 public class ApkSignatureHelper {
     private static final byte[] APK_V2_MAGIC = {'A', 'P', 'K', ' ', 'S', 'i', 'g', ' ',
             'B', 'l', 'o', 'c', 'k', ' ', '4', '2'};
+    private static final int APK_V2_SIGNER_SEQUENCE_ID = 0x7109871a;
 
     private static char[] toChars(byte[] mSignature) {
         byte[] sig = mSignature;
@@ -35,15 +36,15 @@ public class ApkSignatureHelper {
     }
 
     private static Certificate[] loadCertificates(JarFile jarFile, JarEntry je, byte[] readBuffer) {
-        try {
-            InputStream is = jarFile.getInputStream(je);
+        try (InputStream is = jarFile.getInputStream(je)) {
             while (is.read(readBuffer, 0, readBuffer.length) != -1) {
+                // Read entire entry to load certificates
             }
-            is.close();
-            return (Certificate[]) (je != null ? je.getCertificates() : null);
-        } catch (Exception e) {
+            return (je != null ? je.getCertificates() : null);
+        } catch (IOException | SecurityException e) {
+            // Certificate loading failed
+            return null;
         }
-        return null;
     }
 
     public static String getApkSignInfo(String apkFilePath) {
@@ -57,8 +58,7 @@ public class ApkSignatureHelper {
     public static String getApkSignV1(String apkFilePath) {
         byte[] readBuffer = new byte[8192];
         Certificate[] certs = null;
-        try {
-            JarFile jarFile = new JarFile(apkFilePath);
+        try (JarFile jarFile = new JarFile(apkFilePath)) {
             Enumeration<?> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry je = (JarEntry) entries.nextElement();
@@ -81,17 +81,16 @@ public class ApkSignatureHelper {
                             }
                         }
                         if (!found || certs.length != localCerts.length) {
-                            jarFile.close();
                             return null;
                         }
                     }
                 }
             }
-            jarFile.close();
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
-        } catch (Throwable ignored) {
+        } catch (IOException | java.security.cert.CertificateException e) {
+            // V1 signature verification failed
+            return null;
         }
-        return null;
     }
 
     private static String getApkSignV2(String apkFilePath) throws IOException {
@@ -130,7 +129,7 @@ public class ApkSignatureHelper {
 
             while (block.remaining() > 24) {
                 size = (int) block.getLong();
-                if (block.getInt() == 0x7109871a) {
+                if (block.getInt() == APK_V2_SIGNER_SEQUENCE_ID) {
                     // signer-sequence length, signer length, signed data length
                     block.position(block.position() + 12);
                     size = block.getInt(); // digests-sequence length

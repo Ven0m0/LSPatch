@@ -50,8 +50,6 @@ import hidden.HiddenApiBridge;
 public class LSPApplication {
 
     private static final String TAG = "LSPatch";
-    private static final int FIRST_APP_ZYGOTE_ISOLATED_UID = 90000;
-    private static final int PER_USER_RANGE = 100000;
 
     private static ActivityThread activityThread;
     private static LoadedApk stubLoadedApk;
@@ -60,7 +58,7 @@ public class LSPApplication {
     private static JSONObject config;
 
     public static boolean isIsolated() {
-        return (android.os.Process.myUid() % PER_USER_RANGE) >= FIRST_APP_ZYGOTE_ISOLATED_UID;
+        return (android.os.Process.myUid() % Constants.PER_USER_RANGE) >= Constants.FIRST_APP_ZYGOTE_ISOLATED_UID;
     }
 
     public static void onLoad() throws RemoteException, IOException {
@@ -199,7 +197,7 @@ public class LSPApplication {
             return;
         }
 
-        var profileDir = HiddenApiBridge.Environment_getDataProfilesDePackageDirectory(appInfo.uid / PER_USER_RANGE, pkgName);
+        var profileDir = HiddenApiBridge.Environment_getDataProfilesDePackageDirectory(appInfo.uid / Constants.PER_USER_RANGE, pkgName);
 
         var attrs = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--------"));
 
