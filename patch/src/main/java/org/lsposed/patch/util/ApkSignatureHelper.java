@@ -38,10 +38,12 @@ public class ApkSignatureHelper {
         try {
             InputStream is = jarFile.getInputStream(je);
             while (is.read(readBuffer, 0, readBuffer.length) != -1) {
+                // Read all bytes to load certificates
             }
             is.close();
             return (Certificate[]) (je != null ? je.getCertificates() : null);
         } catch (Exception e) {
+            // Failed to load certificates, return null
         }
         return null;
     }
@@ -90,6 +92,7 @@ public class ApkSignatureHelper {
             jarFile.close();
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
         } catch (Throwable ignored) {
+            // Failed to extract signature, return null
         }
         return null;
     }

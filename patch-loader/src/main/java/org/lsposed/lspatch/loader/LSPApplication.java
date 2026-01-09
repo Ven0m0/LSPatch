@@ -162,6 +162,7 @@ public class LSPApplication {
                     mLaunchingActivities.forEach(fixActivityClientRecord);
                 }
             } catch (Throwable ignored) {
+                // Failed to hook launching activities, continue without it
             }
             Log.i(TAG, "hooked app initialized: " + appLoadedApk);
 

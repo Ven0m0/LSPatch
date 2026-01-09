@@ -191,6 +191,7 @@ object LSPPackageManager {
             runCatching {
                 var primary: ApplicationInfo? = null
                 val splits = mutableListOf<String>()
+                val expectedPackageName = mutableSetOf<String>()
                 val appInfos = apks.mapNotNull { uri ->
                     val src = DocumentFile.fromSingleUri(lspApp, uri)
                         ?: throw IOException("DocumentFile is null")
@@ -213,11 +214,13 @@ object LSPPackageManager {
                     }
                     if (primary == null) {
                         primary = appInfo
+                        expectedPackageName.add(appInfo.packageName)
+                    } else if (!expectedPackageName.contains(appInfo.packageName)) {
+                        throw IOException("Selected APKs are from different apps: ${expectedPackageName.first()} and ${appInfo.packageName}")
                     }
                     val label = lspApp.packageManager.getApplicationLabel(appInfo).toString()
                     AppInfo(appInfo, label)
                 }
-                // TODO: Check selected apks are from the same app
                 primary?.splitSourceDirs = splits.toTypedArray()
                 if (appInfos.isEmpty()) throw IOException("No apks")
                 appInfos

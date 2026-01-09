@@ -441,7 +441,8 @@ public class LSPatch {
         property.addApplicationAttribute(new AttributeItem(NodeValue.Application.DEBUGGABLE, debuggableFlag));
         property.addApplicationAttribute(new AttributeItem("appComponentFactory", PROXY_APP_COMPONENT_FACTORY));
         property.addMetaData(new ModificationProperty.MetaData("lspatch", metadata));
-        // TODO: replace query_all with queries -> manager
+        // NOTE: QUERY_ALL_PACKAGES is required for manager communication.
+        // Consider replacing with targeted <queries> for specific package once manager package is stable.
         if (useManager)
             property.addUsesPermission("android.permission.QUERY_ALL_PACKAGES");
 

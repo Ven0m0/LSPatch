@@ -114,6 +114,7 @@ public class LSPAppComponentFactoryStub extends AppComponentFactory {
                 try {
                     soPath = java.net.URLDecoder.decode(soPath, "UTF-8");
                 } catch (java.io.UnsupportedEncodingException e) {
+                    // UTF-8 should always be supported, continue with encoded path
                 }
                 Log.i(TAG, "Loading native lib from: " + soPath);
             }

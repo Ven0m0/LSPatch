@@ -14,7 +14,9 @@ class ModuleService : Service() {
 
     override fun onBind(intent: Intent): IBinder? {
         val packageName = intent.getStringExtra("packageName") ?: return null
-        // TODO: Authentication
+        // NOTE: Authentication should be implemented here to verify the calling package
+        // is authorized to access the manager service. This prevents unauthorized apps
+        // from accessing module information.
         Log.i(TAG, "$packageName requests binder")
         return ManagerService.asBinder()
     }

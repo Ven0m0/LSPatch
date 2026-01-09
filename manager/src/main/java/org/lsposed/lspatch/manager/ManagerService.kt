@@ -33,7 +33,7 @@ object ManagerService : ILSPApplicationService.Stub() {
     }
 
     override fun getPrefsPath(packageName: String): String {
-        TODO("Not yet implemented")
+        return "${android.os.Environment.getDataDirectory()}/data/$packageName/shared_prefs/"
     }
 
     override fun requestInjectedManagerBinder(binder: List<IBinder>?): ParcelFileDescriptor? {
