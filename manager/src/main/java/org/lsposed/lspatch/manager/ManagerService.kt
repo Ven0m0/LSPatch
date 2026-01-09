@@ -33,6 +33,13 @@ object ManagerService : ILSPApplicationService.Stub() {
     }
 
     override fun getPrefsPath(packageName: String): String {
+        val callingUid = Binder.getCallingUid()
+        val pm = lspApp.packageManager
+        val packagesForUid = pm.getPackagesForUid(callingUid) ?: emptyArray()
+        if (!packagesForUid.contains(packageName)) {
+            Log.w(TAG, "Unauthorized getPrefsPath access for $packageName from uid $callingUid (packages=${packagesForUid.toList()})")
+            throw SecurityException("Not allowed to access preferences for package: $packageName")
+        }
         return "${android.os.Environment.getDataDirectory()}/data/$packageName/shared_prefs/"
     }
 
