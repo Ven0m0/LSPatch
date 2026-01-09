@@ -34,8 +34,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
@@ -148,13 +152,16 @@ public class LSPatch {
     }
 
     public void doCommandLine() throws PatchError, IOException {
+        var outputDir = new File(outputPath);
+        outputDir.mkdirs();
+
+        List<File> patchedFiles = new ArrayList<>();
+        String basePackageName = null;
+
         for (var apk : apkPaths) {
             File srcApkFile = new File(apk).getAbsoluteFile();
 
             String apkFileName = srcApkFile.getName();
-
-            var outputDir = new File(outputPath);
-            outputDir.mkdirs();
 
             File outputFile = new File(outputDir, String.format(
                     Locale.getDefault(), "%s-%d-lspatched.apk",
@@ -167,7 +174,74 @@ public class LSPatch {
             logger.i("Processing " + srcApkFile + " -> " + outputFile);
 
             patch(srcApkFile, outputFile);
+            patchedFiles.add(outputFile);
+
+            // Extract package name from base APK (first non-split APK)
+            if (basePackageName == null && !apkFileName.startsWith("split_")) {
+                try (var zf = ZFile.openReadOnly(srcApkFile)) {
+                    var manifestEntry = zf.get(ANDROID_MANIFEST_XML);
+                    if (manifestEntry != null) {
+                        try (var is = manifestEntry.open()) {
+                            var parsed = ManifestParser.parseManifestFile(is);
+                            if (parsed != null && parsed.packageName != null) {
+                                basePackageName = parsed.packageName;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.d("Could not extract package name: " + e.getMessage());
+                }
+            }
         }
+
+        // Bundle multiple APKs into a single .apks file
+        if (patchedFiles.size() > 1) {
+            String bundleName = basePackageName != null ? basePackageName : "bundle";
+            File bundleFile = new File(outputDir, String.format(
+                    Locale.getDefault(), "%s-%d-lspatched.apks",
+                    bundleName,
+                    LSPConfig.instance.VERSION_CODE)
+            ).getAbsoluteFile();
+
+            logger.i("Creating bundle: " + bundleFile.getName());
+
+            try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(bundleFile))) {
+                // Use STORED method (no compression) for APKs
+                zos.setMethod(ZipOutputStream.STORED);
+
+                for (File apkFile : patchedFiles) {
+                    logger.d("Adding to bundle: " + apkFile.getName());
+                    ZipEntry entry = new ZipEntry(apkFile.getName());
+                    entry.setMethod(ZipEntry.STORED);
+                    entry.setSize(apkFile.length());
+                    entry.setCompressedSize(apkFile.length());
+                    // Calculate CRC32 for STORED entries
+                    entry.setCrc(calculateCrc32(apkFile));
+
+                    zos.putNextEntry(entry);
+                    Files.copy(apkFile.toPath(), zos);
+                    zos.closeEntry();
+
+                    // Delete individual APK after adding to bundle
+                    apkFile.delete();
+                }
+            }
+            logger.i("Done. Output bundle: " + bundleFile.getAbsolutePath());
+        } else if (patchedFiles.size() == 1) {
+            logger.i("Done. Output APK: " + patchedFiles.get(0).getAbsolutePath());
+        }
+    }
+
+    private long calculateCrc32(File file) throws IOException {
+        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+        try (InputStream is = new FileInputStream(file)) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                crc.update(buffer, 0, len);
+            }
+        }
+        return crc.getValue();
     }
 
     public void patch(File srcApkFile, File outputFile) throws PatchError, IOException {
@@ -238,6 +312,19 @@ public class LSPatch {
             final boolean skipSplit = apkPaths.size() > 1 && srcApkFile.getName().startsWith("split_") && appComponentFactory == null;
             if (skipSplit) {
                 logger.i("Packing split apk...");
+
+                // Fix: Also modify split APK manifest when overrideVersionCode is set
+                if (overrideVersionCode) {
+                    logger.d("Updating split apk versionCode to 1");
+                    ModificationProperty property = new ModificationProperty();
+                    property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.VERSION_CODE, 1));
+                    var os = new ByteArrayOutputStream();
+                    (new ManifestEditor(manifestEntry.open(), os, property)).processManifest();
+                    os.flush();
+                    os.close();
+                    dstZFile.add(ANDROID_MANIFEST_XML, new ByteArrayInputStream(os.toByteArray()));
+                }
+
                 for (StoredEntry entry : srcZFile.entries()) {
                     String name = entry.getCentralDirectoryHeader().getName();
                     if (dstZFile.get(name) != null) continue;
