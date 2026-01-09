@@ -20,6 +20,6 @@ public class Constants {
     final static public int SIGBYPASS_LV_MAX = 3;
 
     // Android UID constants
-    final static public int FIRST_APP_ZYGOTE_ISOLATED_UID = 90000;
-    final static public int PER_USER_RANGE = 100000;
+    public static final int FIRST_APP_ZYGOTE_ISOLATED_UID = 90000;
+    public static final int PER_USER_RANGE = 100000;
 }
