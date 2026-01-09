@@ -452,7 +452,6 @@ public class LSPatch {
 
         try (var os = new ByteArrayOutputStream()) {
             (new ManifestEditor(is, os, property)).processManifest();
-            os.flush();
             return os.toByteArray();
         }
     }
