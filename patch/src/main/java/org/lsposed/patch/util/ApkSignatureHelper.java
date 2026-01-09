@@ -87,7 +87,7 @@ public class ApkSignatureHelper {
                 }
             }
             return certs != null ? new String(toChars(certs[0].getEncoded())) : null;
-        } catch (IOException | SecurityException e) {
+        } catch (IOException | java.security.cert.CertificateException e) {
             // V1 signature verification failed
             return null;
         }
