@@ -13,6 +13,7 @@ import android.util.Log;
 
 import org.lsposed.hiddenapibypass.HiddenApiBypass;
 import org.lsposed.lspatch.share.Constants;
+import org.lsposed.lspatch.share.util.StreamUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -88,7 +89,7 @@ public class LSPAppComponentFactoryStub extends AppComponentFactory {
                 try (var zip = new ZipFile(new File(manager.sourceDir));
                      var is = zip.getInputStream(zip.getEntry(Constants.LOADER_DEX_ASSET_PATH));
                      var os = new ByteArrayOutputStream()) {
-                    transfer(is, os);
+                    StreamUtils.transfer(is, os);
                     dex = os.toByteArray();
                 }
                 soPath = manager.sourceDir + "!/assets/lspatch/so/" + libName + "/liblspatch.so";
@@ -96,7 +97,7 @@ public class LSPAppComponentFactoryStub extends AppComponentFactory {
                 Log.i(TAG, "Bootstrap loader from embedment");
                 try (var is = cl.getResourceAsStream(Constants.LOADER_DEX_ASSET_PATH);
                      var os = new ByteArrayOutputStream()) {
-                    transfer(is, os);
+                    StreamUtils.transfer(is, os);
                     dex = os.toByteArray();
                 }
                 java.net.URL url = cl.getResource("assets/npatch/so/" + libName + "/libnpatch.so");
@@ -121,14 +122,6 @@ public class LSPAppComponentFactoryStub extends AppComponentFactory {
             System.load(soPath);
         } catch (Throwable e) {
             throw new ExceptionInInitializerError(e);
-        }
-    }
-
-    private static void transfer(InputStream is, OutputStream os) throws IOException {
-        byte[] buffer = new byte[8192];
-        int n;
-        while (-1 != (n = is.read(buffer))) {
-            os.write(buffer, 0, n);
         }
     }
 }

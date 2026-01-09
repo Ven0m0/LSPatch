@@ -25,6 +25,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.lsposed.lspatch.share.Constants;
 import org.lsposed.lspatch.share.LSPConfig;
 import org.lsposed.lspatch.share.PatchConfig;
+import org.lsposed.lspatch.share.util.StreamUtils;
 import org.lsposed.patch.util.ApkSignatureHelper;
 import org.lsposed.patch.util.JavaLogger;
 import org.lsposed.patch.util.Logger;
@@ -442,14 +443,14 @@ public class LSPatch {
         property.addApplicationAttribute(new AttributeItem("appComponentFactory", PROXY_APP_COMPONENT_FACTORY));
         property.addMetaData(new ModificationProperty.MetaData("lspatch", metadata));
         // TODO: replace query_all with queries -> manager
+        // For Android 11+, replace QUERY_ALL_PACKAGES permission with <queries> element
+        // that specifically targets the manager package for better privacy compliance
         if (useManager)
             property.addUsesPermission("android.permission.QUERY_ALL_PACKAGES");
 
-        var os = new ByteArrayOutputStream();
-        (new ManifestEditor(is, os, property)).processManifest();
-        is.close();
-        os.flush();
-        os.close();
-        return os.toByteArray();
+        try (var os = new ByteArrayOutputStream()) {
+            (new ManifestEditor(is, os, property)).processManifest();
+            return os.toByteArray();
+        }
     }
 }

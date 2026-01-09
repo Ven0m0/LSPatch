@@ -217,7 +217,10 @@ object LSPPackageManager {
                     val label = lspApp.packageManager.getApplicationLabel(appInfo).toString()
                     AppInfo(appInfo, label)
                 }
-                // TODO: Check selected apks are from the same app
+                // Check selected apks are from the same app by comparing package names
+                if (appInfos.distinctBy { it.app.packageName }.size > 1) {
+                    throw IOException("Selected APKs belong to different apps")
+                }
                 primary?.splitSourceDirs = splits.toTypedArray()
                 if (appInfos.isEmpty()) throw IOException("No apks")
                 appInfos

@@ -33,7 +33,9 @@ object ManagerService : ILSPApplicationService.Stub() {
     }
 
     override fun getPrefsPath(packageName: String): String {
-        TODO("Not yet implemented")
+        // Return the preferences path for the given package
+        // Typically this would be in the app's data directory
+        return "${lspApp.filesDir}/prefs/$packageName"
     }
 
     override fun requestInjectedManagerBinder(binder: List<IBinder>?): ParcelFileDescriptor? {

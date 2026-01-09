@@ -35,11 +35,9 @@ public class ApkSignatureHelper {
     }
 
     private static Certificate[] loadCertificates(JarFile jarFile, JarEntry je, byte[] readBuffer) {
-        try {
-            InputStream is = jarFile.getInputStream(je);
+        try (InputStream is = jarFile.getInputStream(je)) {
             while (is.read(readBuffer, 0, readBuffer.length) != -1) {
             }
-            is.close();
             return (Certificate[]) (je != null ? je.getCertificates() : null);
         } catch (Exception e) {
         }
