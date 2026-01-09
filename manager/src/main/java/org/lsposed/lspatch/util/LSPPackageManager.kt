@@ -214,9 +214,9 @@ object LSPPackageManager {
                     }
                     if (primary == null) {
                         primary = appInfo
-                        expectedPackageName.add(appInfo.packageName)
-                    } else if (!expectedPackageName.contains(appInfo.packageName)) {
-                        throw IOException("Selected APKs are from different apps: ${expectedPackageName.first()} and ${appInfo.packageName}")
+                        expectedPackageName = appInfo.packageName
+                    } else if (appInfo.packageName != expectedPackageName) {
+                        throw IOException("Selected APKs are from different apps: $expectedPackageName and ${appInfo.packageName}")
                     }
                     val label = lspApp.packageManager.getApplicationLabel(appInfo).toString()
                     AppInfo(appInfo, label)
