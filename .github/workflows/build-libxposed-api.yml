@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: 'recursive'
         fetch-depth: 0
@@ -31,13 +31,13 @@ jobs:
         ref: 54582730315ba4a3d7cfaf9baf9d23c419e07006
 
     - name: Setup Java
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '21'
         distribution: 'temurin'
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v5
 
     - name: Build libxposed/api
       working-directory: libxposed/api
@@ -49,7 +49,7 @@ jobs:
       run: echo "commit=$(echo ${{ github.sha }} | cut -c-7)" > $GITHUB_ENV
 
     - name: Upload libxposed/api artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: libxposed-api-${{ env.commit }}
         path: libxposed/api/api/build/outputs/*
