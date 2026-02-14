@@ -125,7 +125,7 @@ object ShizukuApi {
             } ?: return false
 
             return try {
-                val command = "cmd package compile -m speed-profile -f $packageName"
+                val command = "cmd package compile -m verify -f $packageName"
                 val output = service.runShellCommand(command)
                 // Return true if output contains "Success"
                 output.contains("Success")
