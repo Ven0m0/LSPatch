@@ -39,6 +39,7 @@ android {
     }
 
     buildFeatures {
+        aidl = true
         compose = true
         buildConfig = true
     }
@@ -83,7 +84,7 @@ afterEvaluate {
 
 dependencies {
     implementation(projects.patch)
-    implementation(projects.services.daemonService)
+    implementation("vector:daemon-service")
     implementation(projects.share.android)
     implementation(projects.share.java)
     implementation(platform(lspatch.androidx.compose.bom))
